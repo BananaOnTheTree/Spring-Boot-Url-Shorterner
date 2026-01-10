@@ -16,7 +16,15 @@ import lombok.Setter;
 public class UrlMapping {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "url_seq"
+    )
+    @SequenceGenerator(
+            name = "url_seq",
+            sequenceName = "url_seq",
+            allocationSize = 50
+    )
     private Long id;
 
     @Column(nullable = false, unique = true, length = 8)
