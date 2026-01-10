@@ -6,11 +6,15 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
-    show-sql: true
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   rabbitmq:
@@ -18,3 +22,6 @@ spring:
     port: 5672
     username: guest
     password: guest
+logging:
+  level:
+    org.hibernate.engine.jdbc.batch.internal.BatchingBatch: DEBUG
