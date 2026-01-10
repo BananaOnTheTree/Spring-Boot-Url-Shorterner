@@ -1,5 +1,6 @@
 package com.bott.url_shortener.service.impl;
 
+import com.bott.url_shortener.BenchmarkTracker;
 import com.bott.url_shortener.model.UrlMapping;
 import com.bott.url_shortener.repository.UrlRepository;
 import com.bott.url_shortener.service.UrlService;
@@ -13,6 +14,7 @@ import java.util.UUID;
 public class UrlServiceImpl implements UrlService {
 
     private final UrlRepository urlRepository;
+    private final BenchmarkTracker tracker;
 
     private String generateNewShortCode() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
@@ -27,6 +29,7 @@ public class UrlServiceImpl implements UrlService {
         mapping.setShortCode(shortCode);
 
         urlRepository.save(mapping);
+        tracker.markDone(1);
         return shortCode;
     }
 
