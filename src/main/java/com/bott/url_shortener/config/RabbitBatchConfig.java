@@ -5,8 +5,10 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("batch")
 public class RabbitBatchConfig {
 
     @Bean
@@ -20,7 +22,7 @@ public class RabbitBatchConfig {
 
         factory.setBatchListener(true);
         factory.setConsumerBatchEnabled(true);
-        factory.setBatchSize(50);
+        factory.setBatchSize(100);
         factory.setReceiveTimeout(1000L);
         return factory;
     }
