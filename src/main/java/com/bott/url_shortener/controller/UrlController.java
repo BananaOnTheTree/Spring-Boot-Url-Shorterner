@@ -1,5 +1,6 @@
 package com.bott.url_shortener.controller;
 
+import com.bott.url_shortener.BenchmarkTracker;
 import com.bott.url_shortener.service.UrlReadService;
 import com.bott.url_shortener.service.UrlWriteService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ public class UrlController {
     private static final String BASE_URL = "http://localhost:8080/";
     private UrlWriteService writeService;
     private UrlReadService readService;
+    private final BenchmarkTracker tracker;
 
     // Do not return raw strings, as ResponseEntity has more information
     @PostMapping("/shorten")
@@ -41,14 +43,17 @@ public class UrlController {
     }
 
     @PostMapping("/benchmark/{count}")
-    public String benchmark(@PathVariable int count) {
-        long start = System.currentTimeMillis();
+    public String benchmark(@PathVariable int count)
+            throws InterruptedException {
+
+        tracker.start(count);
 
         for (int i = 0; i < count; i++) {
             writeService.shorten("https://example.com/" + i);
         }
 
-        return "Sent " + count + " messages in " +
-                (System.currentTimeMillis() - start) + " ms";
+        long time = tracker.await();
+
+        return "Inserted " + count + " records in " + time + " ms";
     }
 }
