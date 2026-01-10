@@ -1,8 +1,7 @@
 package com.bott.url_shortener.controller;
 
 import com.bott.url_shortener.BenchmarkTracker;
-import com.bott.url_shortener.service.UrlReadService;
-import com.bott.url_shortener.service.UrlWriteService;
+import com.bott.url_shortener.service.UrlService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +17,15 @@ import java.util.Map;
 public class UrlController {
 
     private static final String BASE_URL = "http://localhost:8080/";
-    private UrlWriteService writeService;
-    private UrlReadService readService;
-    private final BenchmarkTracker tracker;
+    private UrlService urlService;
+    private BenchmarkTracker tracker;
 
     // Do not return raw strings, as ResponseEntity has more information
+    // Use ? as the generic type for future expansion, such as returning JSON objects
     @PostMapping("/shorten")
-    public ResponseEntity<Map<String, String>> shortenUrl(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> shortenUrl(@RequestBody Map<String, String> request) {
         String originalUrl = request.get("url");
-        String shortCode = writeService.shorten(originalUrl);
+        String shortCode = urlService.shorten(originalUrl);
         log.info("Shortened URL: {} to short code: {}", originalUrl, shortCode);
 
         return ResponseEntity.ok(Map.of("shortUrl", BASE_URL + shortCode));
@@ -37,7 +36,7 @@ public class UrlController {
     // Use HttpServletResponse to handle redirection
     @GetMapping("/{shortCode}")
     public void redirectToUrl(@PathVariable String shortCode, HttpServletResponse response) throws IOException {
-        String originalUrl = readService.getByShortCode(shortCode).getOriginalUrl();
+        String originalUrl = urlService.getByShortCode(shortCode).getOriginalUrl();
         log.info("Redirecting short code: {} to URL: {}", shortCode, originalUrl);
         response.sendRedirect(originalUrl);
     }
@@ -49,11 +48,12 @@ public class UrlController {
         tracker.start(count);
 
         for (int i = 0; i < count; i++) {
-            writeService.shorten("https://example.com/" + i);
+            urlService.shorten("https://example.com/" + i);
         }
 
         long time = tracker.await();
 
         return "Inserted " + count + " records in " + time + " ms";
     }
+
 }
