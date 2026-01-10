@@ -1,6 +1,6 @@
 package com.bott.url_shortener.service.impl;
 
-import com.bott.url_shortener.config.RabbitConfig;
+import com.bott.url_shortener.RabbitConfig;
 import com.bott.url_shortener.message.CreateUrlMessage;
 import com.bott.url_shortener.service.UrlWriteService;
 import lombok.AllArgsConstructor;
