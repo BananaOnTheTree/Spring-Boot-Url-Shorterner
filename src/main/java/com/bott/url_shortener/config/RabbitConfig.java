@@ -1,4 +1,4 @@
-package com.bott.url_shortener;
+package com.bott.url_shortener.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;

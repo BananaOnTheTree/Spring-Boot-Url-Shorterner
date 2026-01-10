@@ -39,4 +39,16 @@ public class UrlController {
         log.info("Redirecting short code: {} to URL: {}", shortCode, originalUrl);
         response.sendRedirect(originalUrl);
     }
+
+    @PostMapping("/benchmark/{count}")
+    public String benchmark(@PathVariable int count) {
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < count; i++) {
+            writeService.shorten("https://example.com/" + i);
+        }
+
+        return "Sent " + count + " messages in " +
+                (System.currentTimeMillis() - start) + " ms";
+    }
 }
