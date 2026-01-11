@@ -32,20 +32,33 @@ public class RabbitTopologyConfig {
     }
 
     @Bean
-    public DirectExchange shortenExchange() {
+    public DirectExchange exchange() {
         return new DirectExchange(Exchanges.EXCHANGE);
     }
 
     @Bean
-    public Queue shortenCreateQueue() {
+    public Queue codeCreateQueue() {
         return new Queue(UrlQueues.CREATE_QUEUE, true);
     }
 
     @Bean
-    public Binding shortenCreateBinding() {
+    public Binding codeCreateBinding() {
         return BindingBuilder
-                .bind(shortenCreateQueue())
-                .to(shortenExchange())
+                .bind(codeCreateQueue())
+                .to(exchange())
                 .with(UrlRoutingKeys.CREATE_KEY);
+    }
+
+    @Bean
+    public Queue codeViewQueue() {
+        return new Queue(UrlQueues.VIEW_QUEUE, true);
+    }
+
+    @Bean
+    public Binding codeViewBinding() {
+        return BindingBuilder
+                .bind(codeViewQueue())
+                .to(exchange())
+                .with(UrlRoutingKeys.VIEW_KEY);
     }
 }

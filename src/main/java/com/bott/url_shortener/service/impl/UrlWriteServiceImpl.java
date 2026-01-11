@@ -1,7 +1,7 @@
 package com.bott.url_shortener.service.impl;
 
 import com.bott.url_shortener.messaging.exchange.Exchanges;
-import com.bott.url_shortener.messaging.message.ShortCodeCreationMessage;
+import com.bott.url_shortener.messaging.message.CodeCreationMessage;
 import com.bott.url_shortener.messaging.routing.UrlRoutingKeys;
 import com.bott.url_shortener.service.UrlWriteService;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ public class UrlWriteServiceImpl implements UrlWriteService {
         rabbitTemplate.convertAndSend(
                 Exchanges.EXCHANGE,
                 UrlRoutingKeys.CREATE_KEY,
-                new ShortCodeCreationMessage(shortCode, originalUrl)
+                new CodeCreationMessage(shortCode, originalUrl)
         );
 
         return shortCode;
