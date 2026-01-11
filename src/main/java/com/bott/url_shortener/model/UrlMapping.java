@@ -22,8 +22,7 @@ public class UrlMapping {
     )
     @SequenceGenerator(
             name = "url_seq",
-            sequenceName = "url_seq",
-            allocationSize = 50
+            sequenceName = "url_seq"
     )
     private Long id;
 

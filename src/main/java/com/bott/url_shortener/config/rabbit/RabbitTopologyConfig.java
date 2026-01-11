@@ -1,5 +1,8 @@
-package com.bott.url_shortener.config;
+package com.bott.url_shortener.config.rabbit;
 
+import com.bott.url_shortener.messaging.exchange.Exchanges;
+import com.bott.url_shortener.messaging.queue.UrlQueues;
+import com.bott.url_shortener.messaging.routing.UrlRoutingKeys;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -11,11 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class RabbitConfig {
-
-    public static final String EXCHANGE_NAME = "shorten.exchange";
-    public static final String CREATE_QUEUE = "shorten.create.queue";
-    public static final String CREATE_ROUTING_KEY = "shorten.create";
+public class RabbitTopologyConfig {
 
     @Bean
     public JacksonJsonMessageConverter messageConverter() {
@@ -34,12 +33,12 @@ public class RabbitConfig {
 
     @Bean
     public DirectExchange shortenExchange() {
-        return new DirectExchange(EXCHANGE_NAME);
+        return new DirectExchange(Exchanges.EXCHANGE);
     }
 
     @Bean
     public Queue shortenCreateQueue() {
-        return new Queue(CREATE_QUEUE, true);
+        return new Queue(UrlQueues.CREATE_QUEUE, true);
     }
 
     @Bean
@@ -47,6 +46,6 @@ public class RabbitConfig {
         return BindingBuilder
                 .bind(shortenCreateQueue())
                 .to(shortenExchange())
-                .with(CREATE_ROUTING_KEY);
+                .with(UrlRoutingKeys.CREATE_KEY);
     }
 }

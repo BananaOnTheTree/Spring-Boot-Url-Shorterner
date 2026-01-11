@@ -1,8 +1,8 @@
-package com.bott.url_shortener.listener;
+package com.bott.url_shortener.listener.short_code_creation;
 
 import com.bott.url_shortener.BenchmarkTracker;
-import com.bott.url_shortener.config.RabbitConfig;
-import com.bott.url_shortener.message.CreateUrlMessage;
+import com.bott.url_shortener.messaging.message.ShortCodeCreationMessage;
+import com.bott.url_shortener.messaging.queue.UrlQueues;
 import com.bott.url_shortener.model.UrlMapping;
 import com.bott.url_shortener.repository.UrlRepository;
 import lombok.AllArgsConstructor;
@@ -24,11 +24,11 @@ public class UrlBatchWriteListener {
     private final BenchmarkTracker tracker;
 
     @RabbitListener(
-            queues = RabbitConfig.CREATE_QUEUE,
+            queues = UrlQueues.CREATE_QUEUE,
             containerFactory = "batchFactory"
     )
     @Transactional
-    public void addUrlMappingBatch(List<CreateUrlMessage> messages) {
+    public void addUrlMappingBatch(List<ShortCodeCreationMessage> messages) {
         log.info("Consuming {} CreateUrlMessages", messages.size());
 
         List<UrlMapping> entities = messages.stream().map(m -> {
