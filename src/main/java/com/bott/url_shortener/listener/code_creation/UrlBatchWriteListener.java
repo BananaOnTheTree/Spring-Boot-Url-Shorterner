@@ -1,8 +1,8 @@
-package com.bott.url_shortener.listener;
+package com.bott.url_shortener.listener.code_creation;
 
 import com.bott.url_shortener.BenchmarkTracker;
-import com.bott.url_shortener.config.RabbitConfig;
-import com.bott.url_shortener.message.CreateUrlMessage;
+import com.bott.url_shortener.messaging.message.CodeCreationMessage;
+import com.bott.url_shortener.messaging.queue.UrlQueues;
 import com.bott.url_shortener.model.UrlMapping;
 import com.bott.url_shortener.repository.UrlRepository;
 import lombok.AllArgsConstructor;
@@ -24,21 +24,25 @@ public class UrlBatchWriteListener {
     private final BenchmarkTracker tracker;
 
     @RabbitListener(
-            queues = RabbitConfig.CREATE_QUEUE,
-            containerFactory = "batchFactory"
+            queues = UrlQueues.CREATE_QUEUE,
+            containerFactory = "codeCreationBatchFactory"
     )
     @Transactional
-    public void addUrlMappingBatch(List<CreateUrlMessage> messages) {
-        log.info("Consuming {} CreateUrlMessages", messages.size());
-
+    public void addUrlMappingBatch(List<CodeCreationMessage> messages) {
         List<UrlMapping> entities = messages.stream().map(m -> {
             UrlMapping urlMapping = new UrlMapping();
-            urlMapping.setShortCode(m.getShortCode());
-            urlMapping.setOriginalUrl(m.getOriginalUrl());
+            urlMapping.setShortCode(m.shortCode());
+            urlMapping.setOriginalUrl(m.originalUrl());
             return urlMapping;
         }).toList();
 
         urlRepository.saveAll(entities);
-        tracker.markDone(messages.size());
+        if (tracker.isEnabled()) {
+            tracker.markDone(messages.size());
+        }
+        log.info("Successfully shortened {} URLs in batch.", messages.size());
+        if (!messages.isEmpty()) {
+            log.info("First record: short code: {}, original URL: {}", messages.get(0).shortCode(), messages.get(0).originalUrl());
+        }
     }
 }

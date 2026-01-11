@@ -1,19 +1,16 @@
-package com.bott.url_shortener.listener;
+package com.bott.url_shortener.listener.code_creation;
 
 import com.bott.url_shortener.BenchmarkTracker;
-import com.bott.url_shortener.config.RabbitConfig;
+import com.bott.url_shortener.messaging.queue.UrlQueues;
 import com.bott.url_shortener.model.UrlMapping;
 import com.bott.url_shortener.repository.UrlRepository;
-import com.bott.url_shortener.message.CreateUrlMessage;
+import com.bott.url_shortener.messaging.message.CodeCreationMessage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -25,17 +22,19 @@ public class UrlWriteListener {
     private final BenchmarkTracker tracker;
 
     @RabbitListener(
-            queues = RabbitConfig.CREATE_QUEUE
+            queues = UrlQueues.CREATE_QUEUE,
+            containerFactory = "codeCreationNoBatchFactory"
     )
     @Transactional
-    public void addUrlMapping(CreateUrlMessage message) {
-
+    public void addUrlMapping(CodeCreationMessage message) {
         UrlMapping urlMapping = new UrlMapping();
-        urlMapping.setShortCode(message.getShortCode());
-        urlMapping.setOriginalUrl(message.getOriginalUrl());
+        urlMapping.setShortCode(message.shortCode());
+        urlMapping.setOriginalUrl(message.originalUrl());
 
         urlRepository.save(urlMapping);
-        tracker.markDone(1);
+        log.info("Shortened URL: {} to short code: {}", message.originalUrl(), message.shortCode());
+        if (tracker.isEnabled()) {
+            tracker.markDone(1);
+        }
     }
-
 }
