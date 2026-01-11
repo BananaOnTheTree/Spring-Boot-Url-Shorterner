@@ -19,7 +19,7 @@ public class UrlWriteServiceImpl implements UrlWriteService {
 
     @NotNull
     private String generateNewShortCode() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 16);
     }
 
     @Override

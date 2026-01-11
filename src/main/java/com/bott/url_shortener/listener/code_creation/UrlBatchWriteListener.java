@@ -37,10 +37,12 @@ public class UrlBatchWriteListener {
         }).toList();
 
         urlRepository.saveAll(entities);
-        if (tracker.isEnable()) {
+        if (tracker.isEnabled()) {
             tracker.markDone(messages.size());
         }
         log.info("Successfully shortened {} URLs in batch.", messages.size());
-        log.info("First record: short code: {}, original URL: {}", messages.get(0).shortCode(), messages.get(0).originalUrl());
+        if (!messages.isEmpty()) {
+            log.info("First record: short code: {}, original URL: {}", messages.get(0).shortCode(), messages.get(0).originalUrl());
+        }
     }
 }

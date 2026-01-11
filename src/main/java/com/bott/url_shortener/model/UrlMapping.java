@@ -26,7 +26,7 @@ public class UrlMapping {
     )
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 8)
+    @Column(nullable = false, unique = true, length = 16)
     private String shortCode;
 
     @Column(nullable = false, length = 2048)

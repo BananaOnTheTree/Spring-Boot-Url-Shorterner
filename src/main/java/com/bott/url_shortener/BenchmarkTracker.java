@@ -11,12 +11,12 @@ public class BenchmarkTracker {
 
     private CountDownLatch latch;
     private long startTime;
-    private boolean isEnable = false;
+    private boolean isEnabled = false;
 
     public synchronized void start(int count) {
         this.latch = new CountDownLatch(count);
         this.startTime = System.currentTimeMillis();
-        this.isEnable = true;
+        this.isEnabled = true;
     }
 
     public void markDone(int processed) {
@@ -27,7 +27,7 @@ public class BenchmarkTracker {
 
     public long await() throws InterruptedException {
         latch.await();
-        this.isEnable = false;
+        this.isEnabled = false;
         return System.currentTimeMillis() - startTime;
     }
 }

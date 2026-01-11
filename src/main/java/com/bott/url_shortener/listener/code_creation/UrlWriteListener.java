@@ -33,7 +33,7 @@ public class UrlWriteListener {
 
         urlRepository.save(urlMapping);
         log.info("Shortened URL: {} to short code: {}", message.originalUrl(), message.shortCode());
-        if (tracker.isEnable()) {
+        if (tracker.isEnabled()) {
             tracker.markDone(1);
         }
     }

@@ -21,12 +21,12 @@ public class UrlAccess {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 2048)
+    @Column(nullable = false, length = 16)
     private String shortCode;
 
     @Column(nullable = false)
     private Instant accessTime;
 
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 45)
     private String ipAddress;
 }
