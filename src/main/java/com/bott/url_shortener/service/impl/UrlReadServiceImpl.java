@@ -10,10 +10,8 @@ import com.bott.url_shortener.service.UrlReadService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 import java.time.Instant;
 
 @Service
@@ -21,42 +19,22 @@ import java.time.Instant;
 @Slf4j
 public class UrlReadServiceImpl implements UrlReadService {
 
-    private static final String CACHE_PREFIX = "url_mapping::";
     private final UrlRepository urlRepository;
     private final RabbitTemplate rabbitTemplate;
-    private final RedisTemplate<String, UrlMapping> redisTemplate;
 
     @Override
+    @Cacheable(
+            value = "urlMappings",
+            key = "#shortCode",
+            unless = "#result == null"
+    )
     public UrlMapping getByShortCode(String shortCode) {
-        String cacheKey = CACHE_PREFIX + shortCode;
-
-        long start = System.nanoTime();
-
-        UrlMapping urlMapping = redisTemplate.opsForValue().get(cacheKey);
-
-        long afterRedis = System.nanoTime();
-        if (urlMapping != null) {
-            log.info("Cache hit for short code: {}, time to get from Redis: {} ms",
-                    shortCode,
-                    (afterRedis - start) / 1_000_000);
-            return urlMapping;
-        }
-
-        log.info("Cache miss for short code: {}", shortCode);
-
-        urlMapping = urlRepository.findByShortCode(shortCode)
-                .orElseThrow(() -> new ShortCodeNotFoundException("Short code not found: " + shortCode));
-
-        redisTemplate.opsForValue().set(cacheKey, urlMapping, Duration.ofHours(1));
-
-        long end = System.nanoTime();
-
-        log.info("Total time getByShortCode({}) = {} ms",
-                shortCode,
-                (end - start) / 1_000_000);
-
-        return urlMapping;
+        return urlRepository.findByShortCode(shortCode)
+                .orElseThrow(() ->
+                        new ShortCodeNotFoundException("Short code not found: " + shortCode)
+                );
     }
+
 
     @Override
     public void publishUrlViewEvent(String shortCode, String ipAddress, Instant time) {
